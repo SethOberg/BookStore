@@ -7,6 +7,8 @@ The project also has a PostgreSQL database that the data is saved to.
 ## Technologies used
 
 - C#
-- ASP.NET CORE
-- Entity Framework core
+- ASP.NET 
+- Entity Framework
 - PostgreSQL
+- Swagger
+- REST
