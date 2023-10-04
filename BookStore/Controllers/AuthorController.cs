@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BookStore.Data;
 using BookStore.Models;
+using BookStore.DTOs;
 
 namespace BookStore.Controllers
 {
@@ -23,24 +24,36 @@ namespace BookStore.Controllers
 
         // GET: api/Author
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Author>>> GetAuthors()
+        public async Task<ActionResult<IEnumerable<AuthorWithBooksDTO>>> GetAuthors()
         {
-          if (_context.Authors == null)
-          {
-              return NotFound();
-          }
-            return await _context.Authors.ToListAsync();
+            if (_context.Authors == null)
+            {
+                return NotFound();
+            }
+
+            var authorsWithBooks = await _context.Authors
+                .Include(a => a.Books)
+                .Select(a => AuthorWithBooksDTO.MapAuthorToDTO(a))
+                .ToListAsync();
+
+            return authorsWithBooks;
         }
+
 
         // GET: api/Author/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Author>> GetAuthor(int id)
+        public async Task<ActionResult<AuthorWithBooksDTO>> GetAuthor(int id)
         {
-          if (_context.Authors == null)
-          {
-              return NotFound();
-          }
-            var author = await _context.Authors.FindAsync(id);
+            if (_context.Authors == null)
+            {
+                return NotFound();
+            }
+
+            var author = await _context.Authors
+                .Include(a => a.Books)
+                .Where(a => a.Id == id)
+                .Select(a => AuthorWithBooksDTO.MapAuthorToDTO(a))
+                .FirstOrDefaultAsync();
 
             if (author == null)
             {
@@ -84,17 +97,21 @@ namespace BookStore.Controllers
         // POST: api/Author
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Author>> PostAuthor(Author author)
+        public async Task<ActionResult<Author>> PostAuthor(AuthorCreateDTO authorCreateDTO)
         {
-          if (_context.Authors == null)
-          {
-              return Problem("Entity set 'BookStoreContext.Authors'  is null.");
-          }
+            if (_context.Authors == null)
+            {
+                return Problem("Entity set 'BookStoreContext.Authors' is null.");
+            }
+
+            var author = AuthorCreateDTO.createAuthorFromDTO(authorCreateDTO);
+
             _context.Authors.Add(author);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetAuthor", new { id = author.Id }, author);
         }
+
 
         // DELETE: api/Author/5
         [HttpDelete("{id}")]

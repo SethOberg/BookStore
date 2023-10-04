@@ -103,6 +103,8 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseExceptionHandler("/Error");
+    app.UseHsts();
 }
 
 app.UseHttpsRedirection();
@@ -110,6 +112,12 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseStaticFiles();
+
+app.UseRouting();
+
+app.MapRazorPages();
 
 app.Run();
 

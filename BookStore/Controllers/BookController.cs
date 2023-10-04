@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BookStore.Data;
 using BookStore.Models;
+using BookStore.DTOs;
 
 namespace BookStore.Controllers
 {
@@ -23,24 +24,30 @@ namespace BookStore.Controllers
 
         // GET: api/Book
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Book>>> GetBooks()
+        public async Task<ActionResult<IEnumerable<BookWithAuthorsDTO>>> GetBooks()
         {
-          if (_context.Books == null)
-          {
-              return NotFound();
-          }
-            return await _context.Books.ToListAsync();
+            var books = await _context.Books
+                .Include(b => b.Authors)
+                .Select(b => BookWithAuthorsDTO.MapBookToDTO(b))
+                .ToListAsync();
+
+            if (books == null)
+            {
+                return NotFound();
+            }
+
+            return books;
         }
 
         // GET: api/Book/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Book>> GetBook(int id)
+        public async Task<ActionResult<BookWithAuthorsDTO>> GetBook(int id)
         {
-          if (_context.Books == null)
-          {
-              return NotFound();
-          }
-            var book = await _context.Books.FindAsync(id);
+            var book = await _context.Books
+                .Include(b => b.Authors)
+                .Where(b => b.Id == id)
+                .Select(b => BookWithAuthorsDTO.MapBookToDTO(b))
+                .FirstOrDefaultAsync();
 
             if (book == null)
             {
@@ -84,17 +91,22 @@ namespace BookStore.Controllers
         // POST: api/Book
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Book>> PostBook(Book book)
+        public async Task<ActionResult<Book>> PostBook(BookCreateDTO bookCreateDTO)
         {
-          if (_context.Books == null)
-          {
-              return Problem("Entity set 'BookStoreContext.Books'  is null.");
-          }
+            if (_context.Books == null)
+            {
+                return Problem("Entity set 'BookStoreContext.Books' is null.");
+            }
+
+            // Map the BookCreateDTO to a Book entity
+            var book = BookCreateDTO.createBookFromDTO(bookCreateDTO);
+
             _context.Books.Add(book);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetBook", new { id = book.Id }, book);
         }
+
 
         // DELETE: api/Book/5
         [HttpDelete("{id}")]
