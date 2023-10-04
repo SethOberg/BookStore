@@ -34,6 +34,7 @@
     <None Remove="Pages\Books\" />
     <None Remove="Pages\Shared\" />
     <None Remove="Controllers\" />
+    <None Remove="DTOs\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Data\" />
@@ -44,6 +45,7 @@
     <Folder Include="Pages\Shared\" />
     <Folder Include="wwwroot\" />
     <Folder Include="Controllers\" />
+    <Folder Include="DTOs\" />
   </ItemGroup>
   <ItemGroup>
     <Content Remove="wwwroot\" />

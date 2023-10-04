@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BookStore.Data;
 using BookStore.Models;
+using BookStore.DTOs;
 
 namespace BookStore.Controllers
 {
@@ -23,24 +24,63 @@ namespace BookStore.Controllers
 
         // GET: api/Author
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Author>>> GetAuthors()
+        public async Task<ActionResult<IEnumerable<AuthorWithBooksDTO>>> GetAuthors()
         {
-          if (_context.Authors == null)
+            if (_context.Authors == null)
+            {
+                return NotFound();
+            }
+
+            var authorsWithBooks = await _context.Authors
+      .Include(a => a.Books)
+      .Select(a => new AuthorWithBooksDTO
+      {
+          AuthorId = a.Id,
+          FirstName = a.FirstName,
+          LastName = a.LastName,
+          Books = a.Books.Select(b => new BookDTO
           {
-              return NotFound();
-          }
-            return await _context.Authors.ToListAsync();
+              BookId = b.Id,
+              Title = b.Title,
+              PageCount = b.PageCount,
+              Price = b.Price,
+              Published = b.Published,
+              QuantityInStock = b.QuantityInStock
+          }).ToList()
+      })
+      .ToListAsync();
+
+            return authorsWithBooks;
         }
+
 
         // GET: api/Author/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Author>> GetAuthor(int id)
+        public async Task<ActionResult<AuthorWithBooksDTO>> GetAuthor(int id)
         {
           if (_context.Authors == null)
           {
               return NotFound();
           }
-            var author = await _context.Authors.FindAsync(id);
+
+            var author = await _context.Authors
+          .Where(a => a.Id == id)
+          .Select(a => new AuthorWithBooksDTO
+          {
+              AuthorId = a.Id,
+              FirstName = a.FirstName,
+              LastName = a.LastName,
+              Books = a.Books.Select(b => new BookDTO
+              {
+                  BookId = b.Id,
+                  Title = b.Title,
+                  PageCount = b.PageCount,
+                  Price = b.Price,
+                  Published = b.Published,
+                  QuantityInStock = b.QuantityInStock
+              }).ToList()
+          })
+          .FirstOrDefaultAsync();
 
             if (author == null)
             {
