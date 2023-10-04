@@ -91,17 +91,22 @@ namespace BookStore.Controllers
         // POST: api/Book
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Book>> PostBook(Book book)
+        public async Task<ActionResult<Book>> PostBook(BookCreateDTO bookCreateDTO)
         {
-          if (_context.Books == null)
-          {
-              return Problem("Entity set 'BookStoreContext.Books'  is null.");
-          }
+            if (_context.Books == null)
+            {
+                return Problem("Entity set 'BookStoreContext.Books' is null.");
+            }
+
+            // Map the BookCreateDTO to a Book entity
+            var book = BookCreateDTO.createBookFromDTO(bookCreateDTO);
+
             _context.Books.Add(book);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetBook", new { id = book.Id }, book);
         }
+
 
         // DELETE: api/Book/5
         [HttpDelete("{id}")]

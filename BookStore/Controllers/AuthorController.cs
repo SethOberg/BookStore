@@ -97,17 +97,21 @@ namespace BookStore.Controllers
         // POST: api/Author
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Author>> PostAuthor(Author author)
+        public async Task<ActionResult<Author>> PostAuthor(AuthorCreateDTO authorCreateDTO)
         {
             if (_context.Authors == null)
             {
-                return Problem("Entity set 'BookStoreContext.Authors'  is null.");
+                return Problem("Entity set 'BookStoreContext.Authors' is null.");
             }
+
+            var author = AuthorCreateDTO.createAuthorFromDTO(authorCreateDTO);
+
             _context.Authors.Add(author);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetAuthor", new { id = author.Id }, author);
         }
+
 
         // DELETE: api/Author/5
         [HttpDelete("{id}")]
