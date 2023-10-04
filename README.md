@@ -12,3 +12,8 @@ The project also has a PostgreSQL database that the data is saved to.
 - PostgreSQL
 - Swagger
 - REST
+
+## Entity relationship diagram
+
+![EntityRelationshipDiagram](https://github.com/SethOberg/BookStore/assets/48513637/e578eada-6746-4a04-826c-75e34450ea94)
+
