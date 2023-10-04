@@ -1,4 +1,6 @@
 ﻿using System;
+using BookStore.Models;
+
 namespace BookStore.DTOs
 {
     public class BookDTO

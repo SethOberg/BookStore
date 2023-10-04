@@ -28,21 +28,7 @@ namespace BookStore.Controllers
         {
             var books = await _context.Books
                 .Include(b => b.Authors)
-                .Select(b => new BookWithAuthorsDTO
-                {
-                    BookId = b.Id,
-                    Title = b.Title,
-                    PageCount = b.PageCount,
-                    Price = b.Price,
-                    Published = b.Published,
-                    QuantityInStock = b.QuantityInStock,
-                    Authors = b.Authors.Select(a => new AuthorDTO
-                    {
-                        AuthorId = a.Id,
-                        FirstName = a.FirstName,
-                        LastName = a.LastName
-                    }).ToList()
-                })
+                .Select(b => BookWithAuthorsDTO.MapBookToDTO(b))
                 .ToListAsync();
 
             if (books == null)
@@ -60,21 +46,7 @@ namespace BookStore.Controllers
             var book = await _context.Books
                 .Include(b => b.Authors)
                 .Where(b => b.Id == id)
-                .Select(b => new BookWithAuthorsDTO
-                {
-                    BookId = b.Id,
-                    Title = b.Title,
-                    PageCount = b.PageCount,
-                    Price = b.Price,
-                    Published = b.Published,
-                    QuantityInStock = b.QuantityInStock,
-                    Authors = b.Authors.Select(a => new AuthorDTO
-                    {
-                        AuthorId = a.Id,
-                        FirstName = a.FirstName,
-                        LastName = a.LastName
-                    }).ToList()
-                })
+                .Select(b => BookWithAuthorsDTO.MapBookToDTO(b))
                 .FirstOrDefaultAsync();
 
             if (book == null)

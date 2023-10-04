@@ -33,21 +33,7 @@ namespace BookStore.Controllers
 
             var authorsWithBooks = await _context.Authors
                 .Include(a => a.Books)
-                .Select(a => new AuthorWithBooksDTO
-                {
-                    AuthorId = a.Id,
-                    FirstName = a.FirstName,
-                    LastName = a.LastName,
-                    Books = a.Books.Select(b => new BookDTO
-                    {
-                        BookId = b.Id,
-                        Title = b.Title,
-                        PageCount = b.PageCount,
-                        Price = b.Price,
-                        Published = b.Published,
-                        QuantityInStock = b.QuantityInStock
-                    }).ToList()
-                })
+                .Select(a => AuthorWithBooksDTO.MapAuthorToDTO(a))
                 .ToListAsync();
 
             return authorsWithBooks;
@@ -64,23 +50,10 @@ namespace BookStore.Controllers
             }
 
             var author = await _context.Authors
-          .Where(a => a.Id == id)
-          .Select(a => new AuthorWithBooksDTO
-          {
-              AuthorId = a.Id,
-              FirstName = a.FirstName,
-              LastName = a.LastName,
-              Books = a.Books.Select(b => new BookDTO
-              {
-                  BookId = b.Id,
-                  Title = b.Title,
-                  PageCount = b.PageCount,
-                  Price = b.Price,
-                  Published = b.Published,
-                  QuantityInStock = b.QuantityInStock
-              }).ToList()
-          })
-          .FirstOrDefaultAsync();
+                .Include(a => a.Books)
+                .Where(a => a.Id == id)
+                .Select(a => AuthorWithBooksDTO.MapAuthorToDTO(a))
+                .FirstOrDefaultAsync();
 
             if (author == null)
             {
