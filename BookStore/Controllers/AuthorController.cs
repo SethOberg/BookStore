@@ -66,14 +66,25 @@ namespace BookStore.Controllers
         // PUT: api/Author/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutAuthor(int id, Author author)
+        public async Task<IActionResult> PutAuthor(int id, AuthorUpdateDTO authorUpdateDTO)
         {
-            if (id != author.Id)
+            if (id != authorUpdateDTO.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(author).State = EntityState.Modified;
+            // Retrieve the existing Author from the database
+            var existingAuthor = await _context.Authors.FindAsync(id);
+
+            if (existingAuthor == null)
+            {
+                return NotFound();
+            }
+
+            // Update the Author entity with data from the DTO
+            UpdateAuthorFromDTO(existingAuthor, authorUpdateDTO);
+
+            _context.Entry(existingAuthor).State = EntityState.Modified;
 
             try
             {
@@ -93,6 +104,40 @@ namespace BookStore.Controllers
 
             return NoContent();
         }
+
+        // PUT: api/Author/AddBook/{authorId}/{bookId}
+        [HttpPut("AddBook/{authorId}/{bookId}")]
+        public async Task<IActionResult> AddBookToAuthor(int authorId, int bookId)
+        {
+            var author = await _context.Authors.FindAsync(authorId);
+            if (author == null)
+            {
+                return NotFound("Author not found");
+            }
+
+            var book = await _context.Books.FindAsync(bookId);
+            if (book == null)
+            {
+                return NotFound("Book not found");
+            }
+
+            // Add the book to the author's Books collection
+            author.Books.Add(book);
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception)
+            {
+                // Handle any exceptions
+                return StatusCode(500, "An error occurred while adding the book to the author.");
+            }
+
+            return NoContent();
+        }
+
+
 
         // POST: api/Author
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
@@ -133,9 +178,51 @@ namespace BookStore.Controllers
             return NoContent();
         }
 
+
+        // DELETE: api/Author/RemoveBook/{authorId}/{bookId}
+        [HttpDelete("RemoveBook/{authorId}/{bookId}")]
+        public async Task<IActionResult> RemoveBookFromAuthor(int authorId, int bookId)
+        {
+            var author = await _context.Authors.Include(a => a.Books).FirstOrDefaultAsync(a => a.Id == authorId);
+            if (author == null)
+            {
+                return NotFound("Author not found");
+            }
+
+            var book = author.Books.FirstOrDefault(b => b.Id == bookId);
+            if (book == null)
+            {
+                return NotFound("Book not found");
+            }
+
+            // Remove the book from the author's Books collection
+            author.Books.Remove(book);
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception)
+            {
+                // Handle any exceptions
+                return StatusCode(500, "An error occurred while removing the book from the author.");
+            }
+
+            return NoContent();
+        }
+
+
+
         private bool AuthorExists(int id)
         {
             return (_context.Authors?.Any(e => e.Id == id)).GetValueOrDefault();
+        }
+
+        // Helper method to update Author entity from DTO
+        private void UpdateAuthorFromDTO(Author author, AuthorUpdateDTO authorUpdateDTO)
+        {
+            author.FirstName = authorUpdateDTO.FirstName;
+            author.LastName = authorUpdateDTO.LastName;
         }
     }
 }

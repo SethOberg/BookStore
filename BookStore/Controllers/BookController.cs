@@ -60,14 +60,25 @@ namespace BookStore.Controllers
         // PUT: api/Book/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutBook(int id, Book book)
+        public async Task<IActionResult> PutBook(int id, BookUpdateDTO bookUpdateDTO)
         {
-            if (id != book.Id)
+            if (id != bookUpdateDTO.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(book).State = EntityState.Modified;
+            // Retrieve the existing Book from the database
+            var existingBook = await _context.Books.FindAsync(id);
+
+            if (existingBook == null)
+            {
+                return NotFound();
+            }
+
+            // Update the Book entity with data from the DTO
+            UpdateBookFromDTO(existingBook, bookUpdateDTO);
+
+            _context.Entry(existingBook).State = EntityState.Modified;
 
             try
             {
@@ -87,6 +98,39 @@ namespace BookStore.Controllers
 
             return NoContent();
         }
+
+        // PUT: api/Book/AddAuthor/{bookId}/{authorId}
+        [HttpPut("AddAuthor/{bookId}/{authorId}")]
+        public async Task<IActionResult> AddAuthorToBook(int bookId, int authorId)
+        {
+            var book = await _context.Books.FindAsync(bookId);
+            if (book == null)
+            {
+                return NotFound("Book not found");
+            }
+
+            var author = await _context.Authors.FindAsync(authorId);
+            if (author == null)
+            {
+                return NotFound("Author not found");
+            }
+
+            // Add the author to the book's Authors collection
+            book.Authors.Add(author);
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception)
+            {
+                // Handle any exceptions
+                return StatusCode(500, "An error occurred while adding the author to the book.");
+            }
+
+            return NoContent();
+        }
+
 
         // POST: api/Book
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
@@ -128,9 +172,52 @@ namespace BookStore.Controllers
             return NoContent();
         }
 
+        // DELETE: api/Book/RemoveAuthor/{bookId}/{authorId}
+        [HttpDelete("RemoveAuthor/{bookId}/{authorId}")]
+        public async Task<IActionResult> RemoveAuthorFromBook(int bookId, int authorId)
+        {
+            var book = await _context.Books.Include(b => b.Authors).FirstOrDefaultAsync(b => b.Id == bookId);
+            if (book == null)
+            {
+                return NotFound("Book not found");
+            }
+
+            var author = book.Authors.FirstOrDefault(a => a.Id == authorId);
+            if (author == null)
+            {
+                return NotFound("Author not found");
+            }
+
+            // Remove the author from the book's Authors collection
+            book.Authors.Remove(author);
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception)
+            {
+                // Handle any exceptions
+                return StatusCode(500, "An error occurred while removing the author from the book.");
+            }
+
+            return NoContent();
+        }
+
+
         private bool BookExists(int id)
         {
             return (_context.Books?.Any(e => e.Id == id)).GetValueOrDefault();
+        }
+
+        // Helper method to update Book entity from DTO
+        private void UpdateBookFromDTO(Book book, BookUpdateDTO bookUpdateDTO)
+        {
+            book.Title = bookUpdateDTO.Title;
+            book.PageCount = bookUpdateDTO.PageCount;
+            book.Price = bookUpdateDTO.Price;
+            book.Published = bookUpdateDTO.Published;
+            book.QuantityInStock = bookUpdateDTO.QuantityInStock;
         }
     }
 }
