@@ -1,13 +1,13 @@
 # BookStore
 
 This is a backend API project for a Book Store.
-The project uses ASP.NET CORE and features a CRUD API that allows users to add, delete, update Books and Authors.
-The project also has a PostgreSQL database that the data is saved to.
+The project uses ASP.NET and features a CRUD API that allows users to create, read, update and delete Books and Authors.
+The project uses Entity Framework to map entities to a PostgreSQL database.
 
 ## Technologies used
 
 - C#
-- ASP.NET 
+- .NET 7.0
 - Entity Framework
 - PostgreSQL
 - Swagger
