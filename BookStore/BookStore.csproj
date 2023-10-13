@@ -36,6 +36,10 @@
     <None Remove="Controllers\" />
     <None Remove="DTOs\" />
     <None Remove="Enums\" />
+    <None Remove="DTOs\Author\" />
+    <None Remove="DTOs\Book\" />
+    <None Remove="DTOs\User\" />
+    <None Remove="DTOs\Order\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Data\" />
@@ -48,6 +52,10 @@
     <Folder Include="Controllers\" />
     <Folder Include="DTOs\" />
     <Folder Include="Enums\" />
+    <Folder Include="DTOs\Author\" />
+    <Folder Include="DTOs\Book\" />
+    <Folder Include="DTOs\User\" />
+    <Folder Include="DTOs\Order\" />
   </ItemGroup>
   <ItemGroup>
     <Content Remove="wwwroot\" />
