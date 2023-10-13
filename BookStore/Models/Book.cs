@@ -16,9 +16,7 @@ namespace BookStore.Models
         public int? QuantityInStock { get; set; }
         public ICollection<Author> Authors { get; set; } = new List<Author>();
 
-        public Book()
-		{
-		}
-	}
+        public List<OrderDetail> OrderBooks { get; set; } = new List<OrderDetail>();
+    }
 }
 
