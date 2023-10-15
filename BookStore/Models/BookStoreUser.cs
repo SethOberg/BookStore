@@ -1,7 +1,7 @@
 ﻿using System;
 namespace BookStore.Models
 {
-	public class User
+	public class BookStoreUser
 	{
 		public int Id { get; set; }
 		public string Firstname { get; set; }

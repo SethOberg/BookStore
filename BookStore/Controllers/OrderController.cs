@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BookStore.Data;
 using BookStore.Models;
+using BookStore.Enums;
+using BookStore.DTOs.Order;
 
 namespace BookStore.Controllers
 {
@@ -51,50 +53,55 @@ namespace BookStore.Controllers
         }
 
         // PUT: api/Order/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutOrder(int id, Order order)
+        [HttpPut("order/{orderId}")]
+        public async Task<IActionResult> UpdateOrderStatus(int orderId, OrderUpdateDTO orderUpdateDTO)
         {
-            if (id != order.Id)
+            // Find the order by its ID
+            var order = await _context.Orders.FindAsync(orderId);
+
+            if (order == null)
             {
-                return BadRequest();
+                return NotFound(); // Order not found
             }
 
-            _context.Entry(order).State = EntityState.Modified;
+            // Update the order's status with the new order state from the DTO
+            order.orderState = orderUpdateDTO.OrderState;
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!OrderExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            // Save changes to the database
+            await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
         // POST: api/Order
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<Order>> PostOrder(Order order)
+        [HttpPost("user/{userId}/order")]
+        public async Task<ActionResult<Order>> CreateOrderForUser(int userId)
         {
-          if (_context.Orders == null)
-          {
-              return Problem("Entity set 'BookStoreContext.Orders'  is null.");
-          }
-            _context.Orders.Add(order);
+            // Find the user by their ID
+            var user = await _context.Users.FindAsync(userId);
+
+            if (user == null)
+            {
+                return NotFound(); // User not found
+            }
+
+            // Create a new order for the user with the status 'Created'
+            var newOrder = new Order
+            {
+                orderState = OrderState.Created,
+                orderCreated = DateTime.Now // You can set the order creation date as needed
+            };
+
+            // Add the new order to the user's list of orders
+            user.Orders.Add(newOrder);
+
+            // Save changes to the database
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetOrder", new { id = order.Id }, order);
+            // Return the newly created order
+            return CreatedAtAction("GetOrder", new { id = newOrder.Id }, newOrder);
         }
+
 
         // DELETE: api/Order/5
         [HttpDelete("{id}")]
