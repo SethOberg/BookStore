@@ -53,7 +53,7 @@ namespace BookStore.Controllers
 
         // PUT: api/BookStoreUser/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUser(int id, UserCreateDTO userDTO)
+        public async Task<IActionResult> UpdateUser(int id, UserDTO userDTO)
         {
             // Validate and find the existing user
             var existingUser = await _context.Users.FindAsync(id);
@@ -77,7 +77,7 @@ namespace BookStore.Controllers
 
         // POST: api/BookStoreUser
         [HttpPost]
-        public async Task<ActionResult<UserCreateDTO>> CreateUser(UserCreateDTO userDTO)
+        public async Task<ActionResult<UserDTO>> CreateUser(UserDTO userDTO)
         {
             // Validate and map userDTO properties to a new BookStoreUser instance
             var newUser = new BookStoreUser
@@ -92,7 +92,7 @@ namespace BookStore.Controllers
             await _context.SaveChangesAsync();
 
             // Return a response, including the newly created user data
-            var responseDTO = new UserCreateDTO
+            var responseDTO = new UserDTO
             {
                 Firstname = newUser.Firstname,
                 LastName = newUser.LastName,
