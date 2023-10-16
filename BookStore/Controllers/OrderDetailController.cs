@@ -24,18 +24,30 @@ namespace BookStore.Controllers
 
         // GET: api/OrderDetail
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<OrderDetail>>> GetOrderDetails()
+        public async Task<ActionResult<IEnumerable<OrderDetailDTO>>> GetOrderDetails()
         {
-          if (_context.OrderDetails == null)
-          {
-              return NotFound();
-          }
-            return await _context.OrderDetails.ToListAsync();
+            if (_context.OrderDetails == null)
+            {
+                return NotFound();
+            }
+
+            // Retrieve order details from your data source (e.g., _context.OrderDetails)
+            var orderDetails = await _context.OrderDetails.ToListAsync();
+
+            // Map the order details to OrderDetailDTO
+            var orderDetailDTOs = orderDetails.Select(od => new OrderDetailDTO
+            {
+                OrderId = od.OrderId,
+                BookId = od.BookId,
+                Quantity = od.Quantity
+            }).ToList();
+
+            return orderDetailDTOs;
         }
 
         // GET: api/OrderDetail/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<OrderDetail>> GetOrderDetail(int id)
+        public async Task<ActionResult<OrderDetailDTO>> GetOrderDetail(int id)
         {
           if (_context.OrderDetails == null)
           {
@@ -48,7 +60,12 @@ namespace BookStore.Controllers
                 return NotFound();
             }
 
-            return orderDetail;
+            var orderDetailDTO = new OrderDetailDTO {
+            OrderId = orderDetail.OrderId,
+            BookId = orderDetail.BookId,
+            Quantity = orderDetail.Quantity};
+
+            return orderDetailDTO;
         }
 
         // PUT: api/OrderDetail/5

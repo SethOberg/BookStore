@@ -16,9 +16,9 @@ namespace BookStore.DTOs
         public DateTime? Published { get; set; }
         public int? QuantityInStock { get; set; }
 
-        public static Book createBookFromDTO(BookCreateDTO bookCreateDTO)
+        public static BookStore.Models.Book createBookFromDTO(BookCreateDTO bookCreateDTO)
         {
-            return new Book
+            return new BookStore.Models.Book
             {
                 Title = bookCreateDTO.Title,
                 PageCount = bookCreateDTO.PageCount,

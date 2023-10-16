@@ -9,6 +9,8 @@ using BookStore.Data;
 using BookStore.Models;
 using BookStore.Enums;
 using BookStore.DTOs.Order;
+using BookStore.DTOs;
+using BookStore.DTOs.OrderDetail;
 
 namespace BookStore.Controllers
 {
@@ -25,31 +27,68 @@ namespace BookStore.Controllers
 
         // GET: api/Order
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Order>>> GetOrders()
+        public async Task<ActionResult<IEnumerable<OrderDTO>>> GetOrdersWithDetails()
         {
-          if (_context.Orders == null)
-          {
-              return NotFound();
-          }
-            return await _context.Orders.ToListAsync();
+            var orders = await _context.Orders
+                .Include(o => o.OrderDetails)
+                .ThenInclude(od => od.Book) // Include the related books
+                .ToListAsync();
+
+            var orderDTOs = orders.Select(order => new OrderDTO
+            {
+                OrderId = order.Id,
+                OrderDetails = order.OrderDetails.Select(od => new OrderDetailWithBookDTO
+                {
+                    Quantity = od.Quantity,
+                    Book = new BookDTO
+                    {
+                        BookId = od.Book.Id,
+                        Title = od.Book.Title,
+                        PageCount = od.Book.PageCount,
+                        Price = od.Book.Price,
+                        Published = od.Book.Published,
+                        QuantityInStock = od.Book.QuantityInStock
+                    }
+                }).ToList()
+            }).ToList();
+
+            return orderDTOs;
         }
 
         // GET: api/Order/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Order>> GetOrder(int id)
+        public async Task<ActionResult<OrderDTO>> GetOrder(int id)
         {
-          if (_context.Orders == null)
-          {
-              return NotFound();
-          }
-            var order = await _context.Orders.FindAsync(id);
+            var order = await _context.Orders
+                .Include(o => o.OrderDetails)
+                .ThenInclude(od => od.Book) // Include the related books
+                .FirstOrDefaultAsync(o => o.Id == id);
 
             if (order == null)
             {
                 return NotFound();
             }
 
-            return order;
+            // Project the order and order details into the OrderDTO
+            var orderDTO = new OrderDTO
+            {
+                OrderId = order.Id,
+                OrderDetails = order.OrderDetails.Select(od => new OrderDetailWithBookDTO
+                {
+                    Quantity = od.Quantity,
+                    Book = new BookDTO
+                    {
+                        BookId = od.Book.Id,
+                        Title = od.Book.Title,
+                        PageCount = od.Book.PageCount,
+                        Price = od.Book.Price,
+                        Published = od.Book.Published,
+                        QuantityInStock = od.Book.QuantityInStock
+                    }
+                }).ToList()
+            };
+
+            return orderDTO;
         }
 
         // PUT: api/Order/5

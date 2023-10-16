@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using BookStore.Data;
 using BookStore.Models;
 using BookStore.DTOs.User;
+using BookStore.DTOs.OrderDetail;
 
 namespace BookStore.Controllers
 {
@@ -24,31 +25,47 @@ namespace BookStore.Controllers
 
         // GET: api/BookStoreUser
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<BookStoreUser>>> GetUsers()
+        public async Task<ActionResult<IEnumerable<UserDTO>>> GetUsers()
         {
           if (_context.Users == null)
           {
               return NotFound();
           }
-            return await _context.Users.ToListAsync();
+
+            var users = await _context.Users.ToListAsync();
+            var userDTOs = users.Select(user => new UserDTO
+            {
+                Email = user.Email,
+                Firstname = user.Firstname,
+                LastName = user.LastName
+            }).ToList();
+
+            return userDTOs;
         }
 
         // GET: api/BookStoreUser/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<BookStoreUser>> GetBookStoreUser(int id)
+        public async Task<ActionResult<UserDTO>> GetBookStoreUser(int id)
         {
           if (_context.Users == null)
           {
               return NotFound();
           }
-            var bookStoreUser = await _context.Users.FindAsync(id);
+            var user = await _context.Users.FindAsync(id);
 
-            if (bookStoreUser == null)
+            if (user == null)
             {
                 return NotFound();
             }
 
-            return bookStoreUser;
+            var userDTO = new UserDTO
+            {
+                Email = user.Email,
+                Firstname = user.Firstname,
+                LastName = user.LastName
+            };
+
+            return userDTO;
         }
 
         // PUT: api/BookStoreUser/5
