@@ -13,7 +13,7 @@ namespace BookStore.DTOs
         public int? QuantityInStock { get; set; }
         public List<AuthorDTO> Authors { get; set; }
 
-        public static BookWithAuthorsDTO MapBookToDTO(Book b)
+        public static BookWithAuthorsDTO MapBookToDTO(BookStore.Models.Book b)
         {
             return new BookWithAuthorsDTO
             {
