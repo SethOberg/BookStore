@@ -58,7 +58,6 @@ namespace BookStore.Controllers
         }
 
         // PUT: api/Book/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutBook(int id, BookUpdateDTO bookUpdateDTO)
         {
@@ -133,7 +132,6 @@ namespace BookStore.Controllers
 
 
         // POST: api/Book
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<Book>> PostBook(BookCreateDTO bookCreateDTO)
         {

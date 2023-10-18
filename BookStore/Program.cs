@@ -1,16 +1,18 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using BookStore.Data;
+using BookStore.Enums;
 using BookStore.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 
 builder.Services.AddDbContext<BookStoreContext>(options =>
-options.UseNpgsql(builder.Configuration.GetConnectionString("BookStore")));
-
+options.UseMySQL(builder.Configuration.GetConnectionString("BookStore")));
 
 //using BookStoreContext bookStoreContext = new BookStoreContext();
 
@@ -87,6 +89,25 @@ options.UseNpgsql(builder.Configuration.GetConnectionString("BookStore")));
 //bookStoreContext.Add(author1);
 //bookStoreContext.Add(author2);
 //bookStoreContext.Add(author3);
+
+//BookStoreUser user1 = new BookStoreUser { Firstname = "John", LastName = "Doe", Email = "john@example.com" };
+//BookStoreUser user2 = new BookStoreUser { Firstname = "Jane", LastName = "Smith", Email = "jane@example.com" };
+
+//Order order1 = new Order { orderState = OrderState.Created };
+//Order order2 = new Order { orderState = OrderState.Processing };
+
+//var dracula = bookStoreContext.Books.FirstOrDefault(b => b.Id == 1);
+//var frankenstein = bookStoreContext.Books.FirstOrDefault(b => b.Id == 6);
+
+//var orderDetail1 = new OrderDetail { Book = dracula, Order = order1, Quantity = 1 };
+//var orderDetail2 = new OrderDetail { Book = dracula, Order = order2, Quantity = 1 };
+//var orderDetail3 = new OrderDetail { Book = frankenstein, Order = order2, Quantity = 1 };
+
+//user1.Orders.Add(order1);
+//user2.Orders.Add(order2);
+
+//bookStoreContext.AddRange(user1, user2);
+
 //bookStoreContext.SaveChanges();
 
 // Add services to the container.
