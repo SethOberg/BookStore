@@ -93,7 +93,7 @@ namespace BookStore.Controllers
 
         // POST: api/OrderDetail
         [HttpPost]
-        public async Task<ActionResult<OrderDetail>> CreateOrderDetail(OrderDetailDTO orderDetailDTO)
+        public async Task<ActionResult<OrderDetailDTO>> CreateOrderDetail(OrderDetailDTO orderDetailDTO)
         {
             // Check if the order exists
             var order = await _context.Orders.FindAsync(orderDetailDTO.OrderId);

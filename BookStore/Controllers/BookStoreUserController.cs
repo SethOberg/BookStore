@@ -35,6 +35,7 @@ namespace BookStore.Controllers
             var users = await _context.Users.ToListAsync();
             var userDTOs = users.Select(user => new UserDTO
             {
+                Id = user.Id,
                 Email = user.Email,
                 Firstname = user.Firstname,
                 LastName = user.LastName
@@ -60,6 +61,7 @@ namespace BookStore.Controllers
 
             var userDTO = new UserDTO
             {
+                Id = user.Id,
                 Email = user.Email,
                 Firstname = user.Firstname,
                 LastName = user.LastName
@@ -70,7 +72,7 @@ namespace BookStore.Controllers
 
         // PUT: api/BookStoreUser/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUser(int id, UserDTO userDTO)
+        public async Task<IActionResult> UpdateUser(int id, UserUpdateDTO userDTO)
         {
             // Validate and find the existing user
             var existingUser = await _context.Users.FindAsync(id);
@@ -94,7 +96,7 @@ namespace BookStore.Controllers
 
         // POST: api/BookStoreUser
         [HttpPost]
-        public async Task<ActionResult<UserDTO>> CreateUser(UserDTO userDTO)
+        public async Task<ActionResult<UserUpdateDTO>> CreateUser(UserUpdateDTO userDTO)
         {
             // Validate and map userDTO properties to a new BookStoreUser instance
             var newUser = new BookStoreUser
